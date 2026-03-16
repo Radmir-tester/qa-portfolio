@@ -3,34 +3,46 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver import Keys , ActionChains
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
 browser = webdriver.Firefox()
 
-browser.implicitly_wait(20)
-browser.maximize_window()
+def open():
+    browser.implicitly_wait(20)
+    browser.maximize_window()
 
-browser.get("https://www.labirint.ru/")
-my_cookie = {
-    'name': 'cookie_policy' ,
-    'value': '1'
-}
+def open_main_page ():
+    browser.get("https://www.labirint.ru/")
+    my_cookie = {
+        'name': 'cookie_policy' ,
+        'value': '1'
+    } 
+    browser.add_cookie(my_cookie)
 
-browser.add_cookie(my_cookie)
+def search(term: str):
+    poisk = browser.find_element(By.CSS_SELECTOR, "[placeholder='Поиск по Лабиринту']")
+    poisk.send_keys(term, Keys.ENTER)
 
+def go_to_card_page(index: int):
+    browser.find_elements(By.CSS_SELECTOR , ".product-card ")[index].click()
 
+def click_on_buy_button():
+    waiter = WebDriverWait(browser , 20)
+    waiter.until (EC.presence_of_element_located((By.CSS_SELECTOR,"._delivery_zuu52_128"))) 
+    locator = browser.find_element(By.CSS_SELECTOR,"._price_zuu52_13")
+    locator.click()
 
+def get_cart_counter():
+    return browser.find_element(By.CSS_SELECTOR , ".cartCount_aiaze_184").text 
 
-poisk = browser.find_element(By.CSS_SELECTOR, "[placeholder='Поиск по Лабиринту']")
-poisk.send_keys("Python", Keys.ENTER)
+def close_driver()
+    browser.quit()
 
-
-browser.find_elements(By.CSS_SELECTOR , ".product-card ")[0].click()
-waiter = WebDriverWait(browser , 20)
-waiter.until (EC.presence_of_element_located((By.CSS_SELECTOR,"._delivery_zuu52_128"))) 
-#locator = browser.find_element(By.XPATH, "//button[contains(text(), 'Добавить в корзину')]")
-locator = browser.find_element(By.CSS_SELECTOR,"._price_zuu52_13")
-locator.click()
-counter = browser.find_element(By.CSS_SELECTOR , ".cartCount_aiaze_184").text #_cartCount_1a3wc_104 #._action_1a3wc_1._cart_1a3wc_99._cartActive_1a3wc_121
-print(counter == "1")
-#waiter = WebDriverWait(browser , 15)
-#waiter.until(EC.text_to_be_present_in_element((By.CSS_SELECTOR , "#text") , "Done"))
-#browser.quit()
+def test_1():
+    open()
+    open_main_page()
+    search("python")
+    go_to_card_page(0)
+    click_on_buy_button()
+    counter = get_cart_counter()
+    print(counter == "1")
+    close_driver()
